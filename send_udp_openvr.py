@@ -98,11 +98,13 @@ def main():
         print(f"[INFO] Role mapping: {rolemap}")
 
     try:
+        print("[INFO] Press Ctrl+C to stop.")
         while not stop["flag"]:
             poses = vr.getDeviceToAbsoluteTrackingPose(
                 openvr.TrackingUniverseStanding, 0, openvr.k_unMaxTrackedDeviceCount
             )
             tnow = time.time()
+
             for i, p in enumerate(poses):
                 if not vr.isTrackedDeviceConnected(i):
                     continue
@@ -131,12 +133,19 @@ def main():
                 if role and not args.unscaled:
                     msg["role"] = role
 
-                if rolemap:
-                    print(f"[{role}] x={x:.3f} y={y:.3f} z={z:.3f}")
+                if role:
+                    print(f"[DEBUG] Sending {serial} ({role}) pose: pos={msg['pos']}, quat={msg['quat']}")
+                else:
+                    print(f"[DEBUG] Sending {serial} pose: pos={msg['pos']}, quat={msg['quat']}")
+
+
+                # Send UDP
 
                 sock.sendto(json.dumps(msg).encode("utf-8"), dest)
 
             time.sleep(dt)
+    except Exception as e:
+        print(f"[ERROR] Exception occurred: {e}")
     finally:
         try:
             openvr.shutdown()

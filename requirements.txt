@@ -1,0 +1,3 @@
+# Dependencies for send_udp_openvr.py and vive_ut_openvr.py.
+openvr
+numpy
